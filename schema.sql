@@ -45,7 +45,8 @@ CREATE TABLE Service (
     ServiceID SERIAL PRIMARY KEY,
     ServiceName VARCHAR(100) NOT NULL,
     Description TEXT NOT NULL,
-    Price DECIMAL(10, 2) NOT NULL
+    Price DECIMAL(10, 2) NOT NULL,
+    PortalID INT REFERENCES CRM_Portal(PortalID)
 );
 
 -- Product Table

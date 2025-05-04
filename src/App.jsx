@@ -56,10 +56,12 @@ function App() {
             .from('admin')
             .select('adminid')
             .eq('email', session.user.email)
-            .single()
+            .limit(1)
+            .maybeSingle()
 
-          if (adminError && adminError.code !== 'PGRST116') {
+          if (adminError) {
             console.error('Error checking admin status:', adminError)
+            throw adminError
           }
 
           // Check if user is a customer
@@ -67,10 +69,12 @@ function App() {
             .from('customer')
             .select('customerid')
             .eq('email', session.user.email)
-            .single()
+            .limit(1)
+            .maybeSingle()
 
-          if (customerError && customerError.code !== 'PGRST116') {
+          if (customerError) {
             console.error('Error checking customer status:', customerError)
+            throw customerError
           }
 
           if (adminData) {
@@ -115,7 +119,7 @@ function App() {
         <Route path="/create-portal" element={<CreatePortal />} />
         <Route path="/manage-portals" element={<ManagePortals />} />
         <Route path="/edit-portal/:portalId" element={<EditPortal />} />
-        <Route path="/view-portal/:portalId" element={<ViewPortal />} />
+        <Route path="/portal/:portalId" element={<ViewPortal />} />
         
         {/* Service management routes */}
         <Route path="/services" element={<Services />} />
