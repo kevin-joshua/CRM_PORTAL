@@ -16,7 +16,7 @@ export default function Services() {
     try {
       const { data, error } = await supabase
         .from('service')
-        .select('*')
+        .select('*, portalid:crm_portal ( portalname )')
         .order('created_at', { ascending: false })
 
       if (error) throw error
@@ -124,6 +124,9 @@ export default function Services() {
                 <thead className="bg-gray-50/50">
                   <tr>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Portal Name
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Service Name
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -141,13 +144,16 @@ export default function Services() {
                   {services.map((service) => (
                     <tr key={service.serviceid} className="hover:bg-gray-50 transition duration-150">
                       <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{service.portalid?.portalname || 'N/A'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">{service.servicename}</div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-500">{service.description}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">${service.price}</div>
+                        <div className="text-sm text-gray-900">₹ {service.price}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4">
                         <Link 

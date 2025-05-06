@@ -195,6 +195,31 @@ export default function Dashboard() {
               </Link>
             </div>
           </div>
+
+          <div className="bg-white/80 backdrop-blur-sm overflow-hidden shadow-lg rounded-2xl hover:shadow-xl transition duration-300 ease-in-out">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900">Orders by Portal</h2>
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M3 12h18M3 17h18" />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-gray-600 mb-6">
+                View all orders filtered by portal. Useful for admin reporting.
+              </p>
+              <Link
+                to="/admin-orders"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+              >
+                View Orders by Portal
+                <svg className="ml-2 -mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+          </div>
         </div>
       </main>
     </div>

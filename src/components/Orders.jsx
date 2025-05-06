@@ -6,6 +6,7 @@ const Orders = () => {
   const [loading, setLoading] = useState(true)
   const [orders, setOrders] = useState([])
   const [error, setError] = useState(null)
+  const [deletingOrderId, setDeletingOrderId] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -33,7 +34,10 @@ const Orders = () => {
             orderdate,
             status,
             totalamount,
-            employeeid
+            quantity,
+            employeeid,
+            serviceid,
+            service:serviceid ( servicename )
           `)
           .eq('customerid', customerData.customerid)
           .order('orderdate', { ascending: false })
@@ -50,6 +54,61 @@ const Orders = () => {
 
     fetchOrders()
   }, [navigate])
+
+  const handleDeleteOrder = async (itemId) => {
+    if (!window.confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+      return
+    }
+
+    setDeletingOrderId(itemId)
+    setError(null)
+
+    try {
+      // First check if there are any related records
+      const { data: orderItems, error: itemsError } = await supabase
+        .from('orders')
+        .select('orderid')
+        .eq('orderid', itemId)
+        .limit(1)
+
+      if (itemsError) throw itemsError
+
+      // if (orderItems && orderItems.length > 0) {
+      //   setError('Cannot delete order because it has associated items. Please delete all order items first.')
+      //   return
+      // }
+
+      // Check for related payments
+      // const { data: payments, error: paymentsError } = await supabase
+      //   .from('payments')
+      //   .select('paymentid')
+      //   .eq('orderid', itemId)
+      //   .limit(1)
+
+      // if (paymentsError) throw paymentsError
+
+      // if (payments && payments.length > 0) {
+      //   setError('Cannot delete order because it has associated payments. Please delete all related payments first.')
+      //   return
+      // }
+
+      // If no related records, proceed with deletion
+      const { error: deleteError } = await supabase
+        .from('orders')
+        .delete()
+        .eq('orderid', itemId)
+
+      if (deleteError) throw deleteError
+
+      // Remove the deleted order from the state
+      setOrders(orders.filter(order => order.orderid !== itemId))
+    } catch (error) {
+      console.error('Error deleting order:', error)
+      setError(error.message || 'Failed to delete order')
+    } finally {
+      setDeletingOrderId(null)
+    }
+  }
 
   if (loading) {
     return (
@@ -131,11 +190,11 @@ const Orders = () => {
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {orders.map((order) => (
+            {orders.map((order, index) => (
               <div key={order.orderid} className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:shadow-2xl transition duration-300">
                 <div className="p-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-medium text-gray-900">Order #{order.orderid}</h3>
+                    <h3 className="text-lg font-medium text-gray-900">Order - {index + 1}</h3>
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       order.status === 'delivered' ? 'bg-green-100 text-green-800' :
                       order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
@@ -144,7 +203,23 @@ const Orders = () => {
                       {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                     </span>
                   </div>
-                  <div className="mt-4">
+                  <div className="mt-2 flex items-center text-sm text-gray-500">
+                    <h2 className='text-gray-500 pr-3 pl-1 text-lg'>#</h2>
+                    Order ID: {order.orderid}
+                  </div>
+                  <div className="mt-2 flex items-center text-sm text-gray-500">
+                    <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                    {order.service?.servicename || 'Unknown Service'}
+                  </div>
+                  <div className="mt-2 flex items-center text-sm text-gray-500">
+                    <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V7a2 2 0 00-2-2H6a2 2 0 00-2 2v6" />
+                    </svg>
+                    Quantity: {order.quantity}
+                  </div>
+                  <div className="mt-2">
                     <div className="flex items-center text-sm text-gray-500">
                       <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -155,21 +230,17 @@ const Orders = () => {
                       <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      ${order.totalamount.toFixed(2)}
+                      ₹ {order.totalamount.toFixed(2)}
                     </div>
                   </div>
                   <div className="mt-6 flex space-x-3">
+                    
                     <button
-                      onClick={() => navigate(`/edit-order/${order.orderid}`)}
-                      className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      onClick={() => handleDeleteOrder(order.orderid)}
+                      disabled={deletingOrderId === order.orderid}
+                      className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => navigate(`/delete-order/${order.orderid}`)}
-                      className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    >
-                      Delete
+                      {deletingOrderId === order.orderid ? 'Deleting...' : 'Delete'}
                     </button>
                   </div>
                 </div>
