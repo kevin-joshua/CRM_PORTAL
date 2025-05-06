@@ -21,6 +21,8 @@ import CreateOrder from './components/CreateOrder'
 import EditOrder from './components/EditOrder'
 import DeleteOrder from './components/DeleteOrder'
 import AccountSettings from './components/AccountSettings'
+import AdminOrders from './components/AdminOrders'
+import LandingPage from './components/LandingPage'
 import './App.css'
 
 function App() {
@@ -112,6 +114,9 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Landing page route */}
+        <Route path="/" element={<LandingPage />} />
+        
         {/* Admin routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
@@ -120,7 +125,8 @@ function App() {
         <Route path="/manage-portals" element={<ManagePortals />} />
         <Route path="/edit-portal/:portalId" element={<EditPortal />} />
         <Route path="/portal/:portalId" element={<ViewPortal />} />
-        
+        <Route path="/admin-orders" element={<AdminOrders />} />
+
         {/* Service management routes */}
         <Route path="/services" element={<Services />} />
         <Route path="/create-service" element={<CreateService />} />
@@ -141,9 +147,6 @@ function App() {
         
         {/* Account settings */}
         <Route path="/account-settings" element={<AccountSettings />} />
-        
-        {/* Default route */}
-        <Route path="/" element={<Navigate to="/dashboard" />} />
       </Routes>
     </Router>
   )

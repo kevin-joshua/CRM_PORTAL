@@ -61,7 +61,7 @@ CREATE TABLE Product (
 -- Orders Table
 CREATE TABLE Orders (
     OrderID SERIAL PRIMARY KEY,
-    OrderDate DATE NOT NULL,
+    OrderDate DATE NOT NULL DEFAULT CURRENT_DATE,
     TotalAmount DECIMAL(10, 2) NOT NULL,
     Status VARCHAR(20) CHECK (Status IN ('pending', 'shipped', 'delivered')) NOT NULL,
     CustomerID INT REFERENCES Customer(CustomerID),

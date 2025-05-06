@@ -46,14 +46,20 @@ const CreateOrder = () => {
   }
 
   useEffect(() => {
-    if (selectedPortal) fetchServices()
-  }, [selectedPortal])
+    if (selectedPortal) {
+      fetchServices(selectedPortal);
+    } else {
+      setServices([]);
+      setSelectedService('');
+    }
+  }, [selectedPortal]);
 
-  const fetchServices = async () => {
+  const fetchServices = async (portalId) => {
     try {
       const { data, error } = await supabase
         .from('service')
-        .select('serviceid, servicename, price')
+        .select('serviceid, servicename, price, description')
+        .eq('portalid', portalId)
         .order('servicename', { ascending: true })
 
       if (error) throw error
@@ -229,10 +235,17 @@ const CreateOrder = () => {
                 <option value="">Select a service</option>
                 {services.map((service) => (
                   <option key={service.serviceid} value={service.serviceid}>
-                    {service.servicename} - ${service.price}
+                    {service.servicename} - ₹ {service.price}
                   </option>
                 ))}
               </select>
+              {selectedService && getSelectedService() && (
+                <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-200">
+                  <div className="text-sm text-gray-700">
+                    <span className="font-semibold">Description:</span> {getSelectedService().description}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div>
@@ -251,7 +264,7 @@ const CreateOrder = () => {
                 <h3 className="text-sm font-medium text-gray-900">Order Summary</h3>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
-                    Total Amount: ${(getSelectedService()?.price * quantity).toFixed(2)}
+                    Total Amount: ₹ {(getSelectedService()?.price * quantity).toFixed(2)}
                   </p>
                 </div>
               </div>

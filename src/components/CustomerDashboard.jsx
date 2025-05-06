@@ -141,7 +141,7 @@ export default function CustomerDashboard() {
             >
               Profile
             </button>
-            <button
+            {/* <button
               onClick={() => setActiveTab('orders')}
               className={`px-3 py-2 text-sm font-medium rounded-md ${
                 activeTab === 'orders'
@@ -150,7 +150,7 @@ export default function CustomerDashboard() {
               }`}
             >
               Orders
-            </button>
+            </button> */}
           </nav>
         </div>
 
